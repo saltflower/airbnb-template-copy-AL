@@ -1,7 +1,7 @@
 <?php
 
 /* Add your functions here */
-
+include "config/config.php";
 
 function dbConnect(){
     /* defined in config/config.php */
