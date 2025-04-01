@@ -11,6 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <link href="css/style.css" rel="stylesheet">
     <link rel="icon" href="images/house-heart-fill.svg">
+    <script src="js/script.js" defer></script>
     <link rel="mask-icon" href="images/house-heart-fill.svg" color="#000000">
 </head>
 
@@ -44,63 +45,130 @@
 
 
         <?php
+        $clickedId = 0;
         $neighborhood = $_GET["neighborhood"];
         $room = $_GET["room"];
         $guests = $_GET["guests"];
         include "src/functions.php";
         $conn = dbConnect();
-        function initialSql($n, $r, $g) {
-            $s = "SELECT n.neighborhood, r.type, l.accommodates FROM listings l
+        function initialSql($n, $r, $g)
+        {
+            $s = "SELECT l.id, n.neighborhood, r.type, l.accommodates, l.pictureUrl, l.name, l.rating, l.price FROM listings l
             LEFT JOIN neighborhoods n ON l.neighborhoodId = n.id
             LEFT JOIN roomTypes r ON l.roomTypeId = r.id ";
-            if ($n == "Any") { $s .= "WHERE "; } else { $s .= "WHERE l.neighborhoodId = $n AND "; }
-            if ($r == "Any") { $s .= "l.roomTypeId >= 1";} else { $s .= " l.roomTypeId = $r"; }
+            if ($n == "Any") {
+                $s .= "WHERE ";
+            } else {
+                $s .= "WHERE l.neighborhoodId = $n AND ";
+            }
+            if ($r == "Any") {
+                $s .= "l.roomTypeId >= 1";
+            } else {
+                $s .= " l.roomTypeId = $r";
+            }
             $s .= " AND l.accommodates >= $g LIMIT 20;";
             return $s;
         }
+        function countSql($n, $r, $g) {
+            $s = "SELECT COUNT(*) AS total_count FROM (
+                SELECT 1 FROM listings WHERE ";
+            if ($n == "Any") {
+                $s .= "1 ";
+            } else {
+                $s .= "neighborhoodId = $n ";
+            }
+            if ($r == "Any") {
+                $s .= "AND roomTypeId >= 1 ";
+            } else {
+                $s .= "AND roomTypeId = $r ";
+            }
+            $s .= "AND accommodates >= $g LIMIT 20) AS subquery;";
+            return $s;
+        }
+    function neighborhoodTrans($n) {
+        if ($n == "Any") {
+            return $n;
+        } else {
+            $s = "SELECT neighborhood FROM neighborhoods WHERE id = $n";
+            $conn = dbConnect();
+            foreach ($conn->query($s) as $row) {
+                return $row['neighborhood'];
+            }
+        }
+
+    }
+    function roomTrans($r) {
+        if ($r == "Any") {
+            return $r;
+        } else {
+            $s = "SELECT type FROM roomTypes WHERE id = $r";
+            $conn = dbConnect();
+            foreach ($conn->query($s) as $row) {
+                return $row['type'];
+            }
+        }
+
+    }
+
         $sql = initialSql($neighborhood, $room, $guests);
+        $countSql = countSql($neighborhood, $room, $guests);
+        
         ?>
         <div class="container">
 
-            
+            <?php 
+                $count = 0;
+                 foreach ($conn->query($countSql) as $row) {
+                    $count = $row['total_count'];
+                    echo '<h1>Results (' . $count . ')</h1>';
+                }            
+                echo "<p><str>Neighborhood: " . neighborhoodTrans($neighborhood) . "</str>";
+                echo "<p><str>Room Type: " . roomTrans($room) . "</str>";
+                echo "<p><str>Accommodates: " . $guests . "</str>";
+            ?>
 
 
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                <?php
 
-                <div class="col">
+                foreach ($conn->query($sql) as $row) {
+
+                    echo '<div class="col">
                     <div class="card shadow-sm">
-                        <img src="https://a0.muscache.com/pictures/miso/Hosting-595680673819411804/original/a6e6fda5-2935-4e2e-ba34-2fc50bba5cf3.jpeg">
+                        <img src="' . $row['pictureUrl'] . '">
 
                         <div class="card-body">
-                            <h5 class="card-title">1922 Craftsman Compound in Laurelhurst ~ Sleeps 12</h5>
-                            <p class="card-text">Kerns neighborhood</p>
-                            <p class="card-text">Entire home/apt</p>
+                            <h5 class="card-title">' . $row['name'] . '</h5>
+                            <p class="card-text">' . $row['neighborhood'] . ' neighborhood</p>
+                            <p class="card-text">' . $row['type'] . '</p>
 
-                            <p class="card-text">Accommodates 12</p>
+                            <p class="card-text">Accommodates ' . $row['accommodates'] . '</p>
 
                             <p class="card-text align-bottom">
-                                <i class="bi bi-star-fill"></i><span class=""> 5.00</span>
+                                <i class="bi bi-star-fill"></i><span class=""> ' . $row['rating'] . '</span>
                             </p>
 
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="btn-group">
-                                    <button type="button" id="3301" class="btn btn-sm btn-outline-secondary viewListing" data-bs-toggle="modal" data-bs-target="#fakeAirbnbnModal">View</button>
+                                    <button type="button" id="' . $row['id'] . '" class="btn btn-sm btn-outline-secondary viewListing" data-bs-toggle="modal" data-bs-target="#fakeAirbnbnModal">View</button>
 
                                 </div>
-                                <small class="text-muted">$960.00</small>
+                                <small class="text-muted">$' . $row['price'] . '</small>
 
                             </div>
                         </div>
                     </div><!--.card-->
-                </div><!--.col-->
+                </div><!--.col-->';
+                }
+                
+                ?>
 
 
 
 
-
-
-            </div><!-- .container-->
+            </div>
+        </div><!-- .container-->
 
 
     </main>
