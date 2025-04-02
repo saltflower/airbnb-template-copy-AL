@@ -57,7 +57,9 @@
                                 include "src/functions.php";
                                 $conn = dbConnect();
                                 $sql = 'select * from neighborhoods;';
-                                foreach ($conn->query($sql) as $row) {
+                                $sth = $conn->prepare($sql);
+                                $sth->execute();
+                                foreach ($sth->fetchAll() as $row) {
                                     print '<option value="' . $row['id'] . '">' . $row['neighborhood'] . '</option>';
                                 }
                                 ?>
@@ -76,7 +78,9 @@
                                 
                                 
                                 $sql = 'select * from roomTypes;';
-                                foreach ($conn->query($sql) as $row) {
+                                $sth = $conn->prepare($sql);
+                                $sth->execute();
+                                foreach ($sth->fetchAll() as $row) {
                                     print '<option value="' . $row['id'] . '">' . $row['type'] . '</option>';
                                 }
                                 ?>

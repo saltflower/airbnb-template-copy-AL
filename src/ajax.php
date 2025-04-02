@@ -34,11 +34,15 @@ if ($q == "getData") {
 FROM listings l LEFT JOIN neighborhoods n ON l.neighborhoodId = n.id
 LEFT JOIN hosts h ON l.hostId = h.id
 WHERE l.id = $id;";
-$result = $conn->query($s)->fetch(PDO::FETCH_ASSOC);
+$sth = $conn->prepare($s);
+$sth->execute();
+$result = $sth->fetch(PDO::FETCH_ASSOC);
 }
 if ($q == "getAmenities") {
     $s = "SELECT a.amenity FROM listingAmenities la JOIN amenities a ON la.amenityID = a.id WHERE la.listingID = $id;";
-    foreach ($conn->query($s) as $row) {
+    $sth = $conn->prepare($s);
+    $sth->execute();
+    foreach ($sth->fetchAll() as $row) {
         $result[] = $row['amenity'];
     }
 }

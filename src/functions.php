@@ -65,7 +65,9 @@ function initialSql($n, $r, $g) {
             } else {
                 $s = "SELECT neighborhood FROM neighborhoods WHERE id = $n";
                 $conn = dbConnect();
-                foreach ($conn->query($s) as $row) {
+                $sth = $conn->prepare($s);
+                $sth->execute();
+                foreach ($sth->fetchAll() as $row) {
                     return $row['neighborhood'];
                 }
             }
@@ -78,11 +80,15 @@ function initialSql($n, $r, $g) {
             } else {
                 $s = "SELECT type FROM roomTypes WHERE id = $r";
                 $conn = dbConnect();
-                foreach ($conn->query($s) as $row) {
+                $sth = $conn->prepare($s);
+                $sth->execute();
+                foreach ($sth->fetchAll() as $row) {
                     return $row['type'];
                 }
             }
     
         }
+
+        
 
 ?>
