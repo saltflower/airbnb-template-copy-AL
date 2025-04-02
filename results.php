@@ -45,7 +45,7 @@
 
 
         <?php
-        $clickedId = 0;
+        
         $neighborhood = $_GET["neighborhood"];
         $room = $_GET["room"];
         $guests = $_GET["guests"];
@@ -54,18 +54,11 @@
 
         $sql = initialSql($neighborhood, $room, $guests);
         
-        $countSql = countSql($neighborhood, $room, $guests);
-        
-        
         ?>
         <div class="container">
 
             <?php 
-                $count = 0;
-                 foreach ($conn->query($countSql) as $row) {
-                    $count = $row['total_count'];
-                    echo '<h1>Results (' . $count . ')</h1>';
-                }            
+                $count = resultsAmnt($neighborhood, $room, $guests);   
                 echo "<p><str>Neighborhood: " . neighborhoodTrans($neighborhood) . "</str>";
                 echo "<p><str>Room Type: " . roomTrans($room) . "</str>";
                 echo "<p><str>Accommodates: " . $guests . "</str>";
@@ -79,9 +72,10 @@
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                 <?php
-
-                foreach ($conn->query($sql) as $row) {
-
+                $sth = $conn->prepare($sql);
+                $sth->execute();
+                foreach ($sth->fetchAll() as $row) {
+                    //modals of all the results
                     echo '<div class="col">
                     <div class="card shadow-sm">
                         <img src="' . $row['pictureUrl'] . '">

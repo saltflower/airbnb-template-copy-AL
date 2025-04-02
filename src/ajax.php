@@ -1,6 +1,5 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
 
 include "../config/config.php";
 
@@ -30,15 +29,17 @@ $result = [];
 $conn = dbConnect();
 
 if ($q == "getData") {
+    //for retrieving all data about the listing besides amenities
     $s = "SELECT l.name, l.pictureUrl, n.neighborhood, l.price, l.accommodates, l.rating, h.hostName
 FROM listings l LEFT JOIN neighborhoods n ON l.neighborhoodId = n.id
 LEFT JOIN hosts h ON l.hostId = h.id
 WHERE l.id = $id;";
-$sth = $conn->prepare($s);
-$sth->execute();
-$result = $sth->fetch(PDO::FETCH_ASSOC);
+    $sth = $conn->prepare($s);
+    $sth->execute();
+    $result = $sth->fetch(PDO::FETCH_ASSOC);
 }
 if ($q == "getAmenities") {
+    //for retrieving the list of amenities
     $s = "SELECT a.amenity FROM listingAmenities la JOIN amenities a ON la.amenityID = a.id WHERE la.listingID = $id;";
     $sth = $conn->prepare($s);
     $sth->execute();
@@ -49,7 +50,7 @@ if ($q == "getAmenities") {
 
 
 
-
+//send
 header('Content-Type: application/json');
 if ($result) {
     echo json_encode($result);

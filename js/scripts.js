@@ -14,7 +14,7 @@ async function onViewListing(e) {
                action: "getData"
         },
         success: function(response) {
-            console.log("Raw response:", response); // Log the raw response
+            console.log("Raw response:", response);
             data = response;
             try {
                 if (data.error) {
@@ -43,7 +43,7 @@ async function onViewListing(e) {
                action: "getAmenities"
         },
         success: function(response) {
-            console.log("Raw response:", response); // Log the raw response
+            console.log("Raw response:", response);
             data = response;
             try {
                 if (data.error) {

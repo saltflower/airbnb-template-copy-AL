@@ -54,6 +54,7 @@
                                 <option selected>Any</option>
                                 
                                 <?php
+                                //neighborhood fill select
                                 include "src/functions.php";
                                 $conn = dbConnect();
                                 $sql = 'select * from neighborhoods;';
@@ -76,7 +77,7 @@
                                 <option selected>Any</option>
                                 <?php
                                 
-                                
+                                //room type fill select
                                 $sql = 'select * from roomTypes;';
                                 $sth = $conn->prepare($sql);
                                 $sth->execute();
@@ -91,6 +92,7 @@
                             <div class="container w-25 d-inline-block">
                                 <select class="form-select d-inline-block width:auto" name="guests" id="guests">
                                     <?php
+                                    //1-10 fill select
                                     foreach (range(1, 10) as $i) {
                                         echo "<option value='$i'>$i</option>";
                                     };
@@ -102,7 +104,7 @@
                         </div><!-- row -->
 
                     </div><!-- row -->
-                    <input class="btn btn-primary col col-sm-auto mx-2" type="submit" value="Submit">
+                    <input class="btn btn-primary col col-sm-auto mt-2" type="submit" value="Submit">
                 </form>
             </div><!-- .container-->
         </div><!-- album-->
